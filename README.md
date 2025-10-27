@@ -171,9 +171,9 @@ npm run build # Gera build de produção
 
 ---
 
-## 📸 Prints do projeto (opcional)
+## 📸 Prints do projeto 
 
-> *(Adicione imagens de telas de login, registro e perfil aqui, se quiser.)*
+> [Home](https://github.com/user-attachments/assets/90d3fdbd-53fc-444e-b850-88d77f05e55d)
 
 ---
 
