@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth, googleProvider, signInWithPopup } from "../../firebase"; // ✅ IMPORT PARA GOOGLE
+import { auth, googleProvider, signInWithPopup, githubProvider } from "../../firebase"; // ✅ IMPORT PARA GOOGLE
 
 export const RegisterPage = () => {
   const [name, setName] = useState("");
