@@ -15,12 +15,19 @@ export const LoginPage = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: "url('/banner2.jpg')" }}
-    >
-      <div className="bg-[#ffffffcc] rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
+      style={{ backgroundImage: "url('/banner2.jpg')" }}>
 
+      <div className="bg-[#ffffffcc] rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
         {/* Login Social */}
         <div className="lg:w-1/2 p-4 flex flex-col items-center justify-center space-y-4">
+           
+            <Link
+            to="/"
+            className="text-3xl p-2 text-gray-700 hover:text-blue-600 transition"
+            >
+            <i className="fa-solid fa-house-user"></i>
+            </Link>
+
             <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">
                 Conecte-se:
             </h3>
