@@ -11,6 +11,8 @@ db.exec(`
     nickname TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    photo TEXT,
+    isAdmin INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 `);
