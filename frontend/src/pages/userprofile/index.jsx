@@ -8,14 +8,21 @@ export const ProfilePage = () => {
     email: "",
     password: "",
   });
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Carregar dados do usuário logado ao entrar na página
+  // ✅ Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // remove token
+    navigate("/login"); // redireciona para login
+  };
+
+  // ✅ Verifica se o usuário está logado e carrega dados do perfil
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login");
+      navigate("/login"); // sem token = manda para login
       return;
     }
 
@@ -28,21 +35,15 @@ export const ProfilePage = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.user) {
-          setUser({ ...data.user, password: "" }); // senha não vem do backend
+          setUser({ ...data.user, password: "" }); // limpa senha do estado
         } else {
           navigate("/login");
         }
       })
       .catch(() => navigate("/login"));
-  }, []);
+  }, [navigate]);
 
-  // ✅ Atualização de campos do formulário
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({ ...prevUser, [name]: value }));
-  };
-
-  // ✅ Salvar alterações no backend
+  // ✅ Enviar alterações para backend
   const handleSave = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -56,20 +57,29 @@ export const ProfilePage = () => {
       body: JSON.stringify({
         name: user.name,
         nickname: user.nickname,
-        password: user.password !== "" ? user.password : undefined,
+        password: user.password !== "" ? user.password : undefined, // só se for trocado
       }),
     });
 
     const data = await response.json();
-
     if (response.ok) {
       setMessage("✅ Alterações salvas com sucesso!");
-      setUser((prevUser) => ({ ...prevUser, password: "" }));
+      setUser((prevUser) => ({ ...prevUser, password: "" })); // limpar campo senha
     } else {
-      setMessage(data.message || "❌ Erro ao salvar.");
+      setMessage(data.message || "❌ Erro ao salvar!");
     }
   };
 
+  // ✅ Atualiza campos do formulário
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+  };
+
+  // ⚠ Exibe "Carregando..." enquanto busca dados
+  if (!user.name && !user.email) {
+    return <p className="text-center text-lg mt-10">Carregando dados...</p>;
+  }
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
@@ -135,7 +145,7 @@ export const ProfilePage = () => {
                 name="email"
                 value={user.email}
                 readOnly
-                className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                className="w-full p-2 border border-gray-600 rounded-md bg-gray-100 cursor-not-allowed"
               />
             </div>
 
@@ -156,9 +166,9 @@ export const ProfilePage = () => {
                 <i className="fas fa-save"></i> Salvar
               </button>
 
-              <Link to="/" className="w-1/2 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-600 transition shadow-md flex items-center justify-center gap-2">
-                <i className="fas fa-times"></i> Cancelar
-              </Link>
+              <button onClick={handleLogout} className="w-1/2 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition shadow-md flex items-center justify-center gap-2">
+              <i className="fas fa-sign-out-alt"></i> Logout
+            </button>
             </div>
 
             {message && <p className="text-center text-sm text-red-500 mt-4">{message}</p>}

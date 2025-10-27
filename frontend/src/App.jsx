@@ -4,6 +4,7 @@ import { LoginPage } from './pages/login'
 import { RegisterPage } from './pages/register'
 import { HomePage } from './pages/home'
 import { ProfilePage } from './pages/userprofile'
+import { PrivateRoute } from './PrivateRoute'
 
 function App() {
 
@@ -15,7 +16,11 @@ function App() {
           <Route path='/' element={<HomePage/>} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
-          <Route path='/userprofile' element={<ProfilePage />} />
+          <Route path='/profile' element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute> 
+          } />
         </Routes>
         
       </BrowserRouter>

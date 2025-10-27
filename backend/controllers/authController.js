@@ -97,3 +97,81 @@ export const updateProfile = async (req, res) => {
     return res.status(500).json({ message: "Erro ao atualizar perfil", error });
   }
 };
+
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { email, name, googleId } = req.body;
+
+    if (!email || !googleId) {
+      return res.status(400).json({ message: "Dados do Google inválidos" });
+    }
+
+    // Verifica se usuário já existe
+    let user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+
+    if (!user) {
+      // Se não existe → cria usuário
+      const stmt = db.prepare("INSERT INTO users (name, nickname, email, password) VALUES (?, ?, ?, ?)");
+      stmt.run(name, name.split(" ")[0], email, googleId); // senha recebe UID do Google só para preencher
+      user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    }
+
+    // Gera token JWT
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    res.json({
+      message: "Login com Google bem-sucedido!",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        nickname: user.nickname,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erro no login Google", error });
+  }
+};
+
+export const socialAuth = (req, res) => {
+  try {
+    const { email, name, socialId, provider } = req.body;
+
+    if (!email || !socialId) {
+      return res.status(400).json({ message: "Dados inválidos do provedor social." });
+    }
+
+    let user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+
+    if (!user) {
+      db.prepare(`
+        INSERT INTO users (name, nickname, email, password)
+        VALUES (?, ?, ?, ?)
+      `).run(name, name.split(" ")[0], email, socialId);
+
+      user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    }
+
+    const token = jwt.sign(
+      { id: user.id, provider },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return res.json({
+      message: "Login via " + provider + " realizado!",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        nickname: user.nickname,
+        email: user.email,
+        provider
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Erro login social", error });
+  }
+};

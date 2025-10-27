@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { auth, googleProvider, signInWithPopup } from "../../firebase"; // ✅ IMPORT PARA GOOGLE
 
 export const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -11,6 +12,7 @@ export const RegisterPage = () => {
 
   const navigate = useNavigate();
 
+  // ✅ Cadastro normal via backend
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -19,24 +21,74 @@ export const RegisterPage = () => {
       return;
     }
 
-    // Chamada para backend
-    const response = await fetch("http://localhost:5000/api/auth/register", {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, nickname, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 201) {
+        setMessage("✅ Cadastro realizado com sucesso!");
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setMessage(data.message || "❌ Erro ao cadastrar.");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage("❌ Erro ao conectar com o servidor!");
+    }
+  };
+
+  // ✅ Cadastro/Login via Google (Firebase integrado com backend)
+const registerWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // Envia os dados do Google para o backend
+    const response = await fetch("http://localhost:5000/api/auth/google", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, nickname, email, password }),
+      body: JSON.stringify({
+        email: user.email,
+        name: user.displayName,
+        googleId: user.uid,
+      }),
     });
 
     const data = await response.json();
 
-    if (response.status === 201) {
-      setMessage("✅ Cadastro realizado com sucesso!");
-      setTimeout(() => navigate("/login"), 1500);
+    if (data.token) {
+      localStorage.setItem("token", data.token); // ✅ Salva token JWT
+      navigate("/profile"); // ✅ Redireciona para a página do usuário
     } else {
-      setMessage(data.message || "❌ Erro no cadastro!");
+      setMessage("❌ Erro ao registrar com Google no backend!");
+    }
+  } catch (error) {
+    console.error("Erro no Google Auth:", error);
+    setMessage("❌ Erro ao autenticar com Google.");
+  }
+};
+
+// ✅ Login com GitHub
+  const registerWithGitHub = async () => {
+    try {
+      const result = await signInWithPopup(auth, githubProvider);
+      const user = result.user;
+
+      localStorage.setItem("socialUser", JSON.stringify(user));
+      navigate("/profile");
+    } catch (error) {
+      console.error(error);
+      setMessage("Erro ao autenticar com GitHub.");
     }
   };
+
 
   return (
     <main>
@@ -44,107 +96,53 @@ export const RegisterPage = () => {
         className="min-h-screen bg-cover bg-center flex items-center justify-center"
         style={{ backgroundImage: "url('/banner3.jpg')" }}
       >
-        {/* Caixa branca com opacidade */}
         <div className="bg-white/90 rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
 
-          {/* Registro Social */}
+          {/* Coluna Esquerda - Social Login */}
           <div className="lg:w-1/2 p-4 flex flex-col items-center justify-center space-y-4">
             <Link to="/" className="text-3xl p-2 text-gray-700 hover:text-blue-600 transition">
               <i className="fa-solid fa-house-user"></i>
             </Link>
 
-            <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">
-              Conecte-se:
-            </h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">Conecte-se:</h3>
 
-            <button className="w-full lg:w-3/4 py-2 px-2 text-md rounded-md bg-red-300 text-slate-950 hover:bg-red-600 hover:text-white transition shadow-md flex items-center justify-center gap-2">
+            {/* ✅ Google funcionando */}
+            <button
+              onClick={registerWithGoogle}
+              className="w-full lg:w-3/4 py-2 px-2 text-md rounded-md bg-red-300 text-slate-950 hover:bg-red-600 hover:text-white transition shadow-md flex items-center justify-center gap-2"
+            >
               <i className="fab fa-google"></i> Cadastrar com Google
             </button>
 
-            <button className="w-full lg:w-3/4 py-2 px-2 text-md rounded-md bg-blue-300 text-slate-950 hover:bg-blue-600 hover:text-white transition shadow-md flex items-center justify-center gap-2">
-              <i className="fab fa-facebook-f"></i> Cadastrar com Facebook
-            </button>
-
-            <button className="w-full lg:w-3/4 py-2 px-2 text-md rounded-md bg-slate-400 text-slate-950 hover:bg-slate-600 hover:text-white transition shadow-md flex items-center justify-center gap-2">
+            <button onClick={registerWithGitHub} className="w-full lg:w-3/4 py-2 px-2 text-md rounded-md bg-slate-400 text-slate-950 hover:bg-slate-600 hover:text-white transition shadow-md flex items-center justify-center gap-2">
               <i className="fab fa-github"></i> Cadastrar com GitHub
             </button>
           </div>
 
-          {/* Registro com Email */}
+          {/* Coluna Direita - Formulário de Cadastro */}
           <div className="lg:w-1/2 p-4 mt-6 lg:mt-0">
-            <div className="flex items-center justify-center my-4 lg:hidden">
-              <span className="text-gray-400">ou</span>
-            </div>
-
             <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">
               Cadastre-se com e-mail:
             </h3>
 
             <form onSubmit={handleRegister} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Nome:</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded-md bg-gray-200"
-                  placeholder="Seu Nome Completo"
-                  required
-                />
-              </div>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full p-2 border border-gray-700 rounded-md bg-gray-200" placeholder="Seu Nome Completo" required />
 
-              <div>
-                <label className="text-sm font-medium text-gray-700">Apelido (Username):</label>
-                <input
-                  type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded-md bg-gray-200"
-                  placeholder="Escolha um apelido"
-                  required
-                />
-              </div>
+              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)}
+                className="w-full p-2 border border-gray-700 rounded-md bg-gray-200" placeholder="Escolha um apelido" required />
 
-              <div>
-                <label className="text-sm font-medium text-gray-700">E-mail:</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded-md bg-gray-200"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-2 border border-gray-700 rounded-md bg-gray-200" placeholder="you@example.com" required />
 
-              <div>
-                <label className="text-sm font-medium text-gray-700">Senha:</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded-md bg-gray-200"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 border border-gray-700 rounded-md bg-gray-200" placeholder="••••••••" required />
 
-              <div>
-                <label className="text-sm font-medium text-gray-700">Confirme Senha:</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded-md bg-gray-200"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-2 border border-gray-700 rounded-md bg-gray-200" placeholder="Confirmar senha" required />
 
-              <button
-                type="submit"
-                className="w-full py-2 text-lg font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-950 transition shadow-md mt-6"
-              >
+              <button type="submit"
+                className="w-full py-2 text-lg font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-950 transition shadow-md mt-4">
                 Cadastrar
               </button>
 
@@ -153,10 +151,8 @@ export const RegisterPage = () => {
 
             <div className="text-center mt-6 text-sm">
               <p className="text-gray-600">
-                Já tem conta?{" "}
-                <Link to="/login" className="text-blue-600 hover:text-red-500 font-medium">
-                  Faça login
-                </Link>
+                Já tem conta?
+                <Link to="/login" className="text-blue-600 hover:text-red-500 font-medium"> Faça login</Link>
               </p>
             </div>
           </div>
