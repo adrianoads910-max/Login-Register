@@ -173,7 +173,23 @@ npm run build # Gera build de produção
 
 ## 📸 Prints do projeto 
 
-> [Home](https://github.com/user-attachments/assets/90d3fdbd-53fc-444e-b850-88d77f05e55d)
+### 🔐 Login
+![Tela Home](frontend/public/images/Semtítulo6.png)
+
+### 🧍 Registro
+![Tela de Registro](frontend/public/images/Semtítulo1.png)
+
+### 👤 Perfil
+![Tela de Perfil](frontend/public/images/Semtítulo4.png)
+
+### 👤 Perfil ADM
+![Tela de Perfil](frontend/public/images/Semtítulo2.png)
+
+### 🛠️ Painel Admin
+![Painel Admin](frontend/public/images/Semtítulo3.png)
+
+### 🛠️ Painel Admin
+![Painel Admin](frontend/public/images/Semtítulo6.png)
 
 ---
 
