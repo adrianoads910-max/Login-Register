@@ -42,52 +42,92 @@ export const RegisterPage = () => {
     }
   };
 
-  // ✅ Cadastro/Login via Google (Firebase integrado com backend)
+ 
+// ✅ Cadastro/Login via Google (Firebase + backend)
 const registerWithGoogle = async () => {
   try {
+    // 1️⃣ Login via Firebase
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // Envia os dados do Google para o backend
-    const response = await fetch("http://localhost:5000/api/auth/google", {
+    // 2️⃣ Envia dados para o backend
+    const response = await fetch("http://localhost:5000/api/auth/social-login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: user.email,
         name: user.displayName,
-        googleId: user.uid,
+        email: user.email,
+        photo: user.photoURL,
+        provider: "google",
       }),
     });
 
+    // 3️⃣ Trata resposta
     const data = await response.json();
 
-    if (data.token) {
-      localStorage.setItem("token", data.token); // ✅ Salva token JWT
-      navigate("/profile"); // ✅ Redireciona para a página do usuário
+    if (response.ok && data.token) {
+      // Salva no localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.user?.name || user.displayName);
+      localStorage.setItem("userEmail", data.user?.email || user.email);
+      localStorage.setItem("userPhoto", data.user?.photo || user.photoURL);
+      localStorage.setItem("isAdmin", data.user?.isAdmin || false);
+
+      setMessage("✅ Login com Google realizado!");
+      navigate("/profile");
     } else {
-      setMessage("❌ Erro ao registrar com Google no backend!");
+      console.error("Erro do backend:", data);
+      setMessage(data.message || "❌ Erro ao autenticar com Google.");
     }
   } catch (error) {
-    console.error("Erro no Google Auth:", error);
+    console.error("❌ Erro no Google Auth:", error);
     setMessage("❌ Erro ao autenticar com Google.");
   }
 };
 
-// ✅ Login com GitHub
-  const registerWithGitHub = async () => {
-    try {
-      const result = await signInWithPopup(auth, githubProvider);
-      const user = result.user;
 
-      localStorage.setItem("socialUser", JSON.stringify(user));
+
+ // ✅ Login com GitHub (Firebase + backend)
+const registerWithGitHub = async () => {
+  try {
+    // 1️⃣ Login via Firebase
+    const result = await signInWithPopup(auth, githubProvider);
+    const user = result.user;
+
+    // 2️⃣ Envia para o backend
+    const response = await fetch("http://localhost:5000/api/auth/social-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: user.displayName || "Usuário GitHub",
+        email: user.email,
+        photo: user.photoURL,
+        provider: "github",
+      }),
+    });
+
+    // 3️⃣ Trata resposta
+    const data = await response.json();
+
+    if (response.ok && data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.user?.name || user.displayName);
+      localStorage.setItem("userEmail", data.user?.email || user.email);
+      localStorage.setItem("userPhoto", data.user?.photo || user.photoURL);
+      localStorage.setItem("isAdmin", data.user?.isAdmin || false);
+
+      setMessage("✅ Login com GitHub realizado!");
       navigate("/profile");
-    } catch (error) {
-      console.error(error);
-      setMessage("Erro ao autenticar com GitHub.");
+    } else {
+      console.error("Erro do backend:", data);
+      setMessage(data.message || "❌ Erro ao autenticar com GitHub.");
     }
-  };
+  } catch (error) {
+    console.error("❌ Erro no GitHub Auth:", error);
+    setMessage("❌ Erro ao autenticar com GitHub.");
+  }
+};
+
 
 
   return (
