@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "postinstall": "pnpm rebuild better-sqlite3"
+    "postinstall": "pnpm rebuild better-sqlite3 && echo '✅ better-sqlite3 rebuilt for Linux'"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
