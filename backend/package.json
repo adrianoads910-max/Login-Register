@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "postinstall": "pnpm rebuild better-sqlite3"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
