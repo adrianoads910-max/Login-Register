@@ -134,7 +134,7 @@ const registerWithGitHub = async () => {
     <main>
       <div
         className="min-h-screen bg-cover bg-center flex items-center justify-center"
-        style={{ backgroundImage: "url('/banner3.jpg')" }}
+        style={{ backgroundImage: "url('./banner3.jpg')" }}
       >
         <div className="bg-white/90 rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
 

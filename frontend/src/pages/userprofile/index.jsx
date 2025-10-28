@@ -147,7 +147,7 @@ useEffect(() => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: "url('/banner4.png')" }}
+      style={{ backgroundImage: "url('./banner4.png')" }}
     >
       <div className="bg-white/90 rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
         

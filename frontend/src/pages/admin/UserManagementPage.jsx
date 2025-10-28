@@ -80,7 +80,7 @@ export const UserManagementPage = () => {
 
   return (
     <section className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: "url('/banner5.jpg')" }}>
+      style={{ backgroundImage: "url('./banner5.jpg')" }}>
 
   
     <div className="p-8" >

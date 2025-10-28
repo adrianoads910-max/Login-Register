@@ -109,7 +109,7 @@ export const LoginPage = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: "url('/banner2.jpg')" }}
+      style={{ backgroundImage: "url('./banner2.jpg')" }}
     >
       <div className="bg-[#ffffffcc] rounded-2xl shadow-2xl p-8 max-w-4xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
         {/* Social */}

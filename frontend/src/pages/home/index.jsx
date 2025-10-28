@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 export const HomePage = () => {
     return (
        <main>
-         <div className="min-h-screen bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('/banner.jpg')" }}>
+         <div className="min-h-screen bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('./banner.jpg')" }}>
         <div className="bg-[#ffffffcc] rounded-2xl shadow-2xl p-8 max-w-2xl w-full flex flex-col lg:flex-row lg:divide-x divide-gray-300">
           
           {/* Lado Esquerdo */}
