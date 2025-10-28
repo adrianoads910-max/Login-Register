@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://adrianoads910-max.github.io/Login-Register",
+  "homepage": "https://adrianoads910-max.github.io/Login-Register/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
